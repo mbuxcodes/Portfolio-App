@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+/*
+  Design tokens as CSS custom properties.
+  Components must reference these (via the @theme mapping below) —
+  never hardcode a raw hex value or a raw Tailwind color like `bg-blue-600`.
+  This is what makes future theming (e.g. a dark mode toggle) a token-file
+  change instead of a full rewrite, per Architecture Doc 1 / Phase 1 decision.
+*/
+:root {
+  /* Base monochrome scale */
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-muted: #6b7280;
+  --color-muted-foreground: #9ca3af;
+  --color-border: #e5e7eb;
+  --color-surface: #f9fafb;
+
+  /* Accent (blue) */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-foreground: #ffffff;
+
+  /* Semantic */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+
+  /* Spacing scale */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+
+  /* Shared shape/elevation */
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Reserved for future dark mode — not shipped in v1 UI, structure exists now per Phase 1 */
+.dark {
+  --color-background: #0a0a0a;
+  --color-foreground: #fafafa;
+  --color-muted: #9ca3af;
+  --color-muted-foreground: #6b7280;
+  --color-border: #27272a;
+  --color-surface: #18181b;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-primary-foreground: #0a0a0a;
+}
+
+/*
+  Tailwind v4 CSS-first theme configuration.
+  This maps our CSS variables onto Tailwind utility classes, so
+  `bg-background`, `text-primary`, `border-border` etc. become available
+  and resolve to the tokens above rather than Tailwind's default palette.
+*/
+@theme {
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-border: var(--color-border);
+  --color-surface: var(--color-surface);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --font-size-display: 3rem;
+  --font-size-h1: 2.25rem;
+  --font-size-h2: 1.5rem;
+  --font-size-h3: 1.25rem;
+  --font-size-body: 1rem;
+  --font-size-small: 0.875rem;
+
+  --spacing-xs: var(--space-xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
+  --spacing-2xl: var(--space-2xl);
+
+  --radius-DEFAULT: var(--radius);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+}
+
+/* Font loading: self-hosted with font-display: swap per performance decision (Phase 18) */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-size: var(--font-size-body);
+    line-height: 1.6;
+  }
+
+  h1 {
+    font-size: var(--font-size-h1);
+    line-height: 1.2;
+    font-weight: 600;
+  }
+
+  h2 {
+    font-size: var(--font-size-h2);
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  h3 {
+    font-size: var(--font-size-h3);
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  /* Accessibility floor: every interactive element gets a visible focus ring — never outline:none without a replacement (Architecture Doc 4, Section 6) */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Respect prefers-reduced-motion per accessibility floor */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
