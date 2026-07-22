@@ -48,4 +48,11 @@ export const projectRepository = {
   async deleteById(id) {
     return Project.findByIdAndDelete(id);
   },
+
+  // Used by skill.service.js's delete-safety check (Architecture Doc 3) —
+  // deleting a Skill that's still referenced by Projects must warn the
+  // admin with a count, not silently proceed.
+  async countByTechStackId(skillId) {
+    return Project.countDocuments({ techStack: skillId });
+  },
 };
