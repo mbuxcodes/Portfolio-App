@@ -7,6 +7,10 @@ import {
   publicExperienceRouter,
   adminExperienceRouter,
 } from "./experience.routes.js";
+import {
+  publicEducationRouter,
+  adminEducationRouter,
+} from "./education.routes.js";
 
 const router = Router();
 
@@ -19,5 +23,7 @@ router.use("/about", publicAboutRouter);
 router.use("/admin/about", adminAboutRouter);
 router.use("/experiences", publicExperienceRouter);
 router.use("/admin/experiences", adminExperienceRouter);
+router.use("/education", publicEducationRouter);
+router.use("/admin/education", adminEducationRouter);
 
 export default router;
