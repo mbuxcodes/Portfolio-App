@@ -1,5 +1,6 @@
 import { skillRepository } from "../repositories/skill.repository.js";
 import { projectRepository } from "../repositories/project.repository.js";
+import { experienceRepository } from "../repositories/experience.repository.js";
 import { sanitizeRichText } from "../utils/sanitizeHtml.js";
 import AppError from "../utils/AppError.js";
 
@@ -72,15 +73,14 @@ export const skillService = {
 
     const referencingProjectCount =
       await projectRepository.countByTechStackId(id);
-
-    // TODO (once Experience CRUD exists — later Milestone 2 step):
-    // const referencingExperienceCount = await experienceRepository.countByTechUsedId(id);
-    // total these two counts together in the check and warning message below.
-    const totalReferences = referencingProjectCount;
+    const referencingExperienceCount =
+      await experienceRepository.countByTechUsedId(id);
+    const totalReferences =
+      referencingProjectCount + referencingExperienceCount;
 
     if (totalReferences > 0 && !force) {
       throw new AppError(
-        `This skill is used by ${referencingProjectCount} project(s). Pass ?force=true to delete it anyway — existing references will be left in place, not cascade-deleted.`,
+        `This skill is used by ${referencingProjectCount} project(s) and ${referencingExperienceCount} experience(s). Pass ?force=true to delete it anyway — existing references will be left in place, not cascade-deleted.`,
         409,
         "SKILL_IN_USE",
       );
