@@ -27,6 +27,11 @@ export const projectController = {
     return success(res, { data: projects, message: "Projects retrieved" });
   },
 
+  async getProjectByIdForAdmin(req, res) {
+    const project = await projectService.getProjectByIdForAdmin(req.params.id);
+    return success(res, { data: project, message: "Project retrieved" });
+  },
+
   async createProject(req, res) {
     const project = await projectService.createProject(req.body);
     return success(res, {

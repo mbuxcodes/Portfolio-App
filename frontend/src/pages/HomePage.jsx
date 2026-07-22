@@ -1,26 +1,26 @@
-import { Link } from 'react-router-dom';
-import Button from '@/components/Button';
-import Card from '@/components/Card';
-import Badge from '@/components/Badge';
+import { Link } from "react-router-dom";
+import Button from "@/components/Button";
+import Card from "@/components/Card";
+import Badge from "@/components/Badge";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { useGetProjectsQuery } from "@/features/projects/projectsApi";
 
-// TODO (Milestone 2): replace with useGetProjectsQuery({ featured: true }) from projectsApi
-const placeholderFeaturedProjects = [
-  { id: '1', title: 'Project One', category: 'Personal', slug: 'project-one' },
-  { id: '2', title: 'Project Two', category: 'Freelance', slug: 'project-two' },
-];
-
-// TODO (Milestone 2): replace with useGetSkillsQuery from skillsApi
-const placeholderTopSkills = ['React', 'Node.js', 'MongoDB', 'Express'];
+// TODO (later step): replace with useGetSkillsQuery from skillsApi
+const placeholderTopSkills = ["React", "Node.js", "MongoDB", "Express"];
 
 function HomePage() {
+  const { data: projectsResponse, isLoading } = useGetProjectsQuery({});
+  const featuredProjects = (projectsResponse?.data || []).filter(
+    (project) => project.featured,
+  );
   return (
     <div className="mx-auto max-w-[1200px] px-md">
       {/* Hero */}
       <section className="flex flex-col items-start gap-sm py-2xl">
         <h1 className="text-display font-bold">Your Name</h1>
         <p className="max-w-xl text-body text-muted">
-          Full Stack Developer specializing in the MERN stack — I build production-grade web
-          applications, end to end.
+          Full Stack Developer specializing in the MERN stack — I build
+          production-grade web applications, end to end.
         </p>
         <div className="flex gap-sm pt-sm">
           {/* TODO (Milestone 2): wire to real resume URL from /api/resume */}
@@ -34,9 +34,13 @@ function HomePage() {
       {/* Featured Projects */}
       <section className="py-xl">
         <h2 className="pb-md">Featured Projects</h2>
+        {isLoading && <LoadingSpinner label="Loading projects" />}
+        {!isLoading && featuredProjects.length === 0 && (
+          <p className="text-muted">No featured projects yet.</p>
+        )}
         <div className="grid grid-cols-1 gap-md md:grid-cols-2 lg:grid-cols-3">
-          {placeholderFeaturedProjects.map((project) => (
-            <Link key={project.id} to={`/projects/${project.slug}`}>
+          {featuredProjects.map((project) => (
+            <Link key={project._id} to={`/projects/${project.slug}`}>
               <Card interactive className="h-full">
                 <Badge tone="muted">{project.category}</Badge>
                 <h3 className="pt-sm">{project.title}</h3>
@@ -63,10 +67,13 @@ function HomePage() {
         <h2 className="pb-md">About</h2>
         {/* TODO (Milestone 2): replace with useGetAboutQuery from aboutApi */}
         <p className="max-w-2xl text-muted">
-          A short bio placeholder goes here, summarizing your background and what drives you as an
-          engineer.
+          A short bio placeholder goes here, summarizing your background and
+          what drives you as an engineer.
         </p>
-        <Link to="/about" className="mt-sm inline-block text-primary hover:text-primary-hover">
+        <Link
+          to="/about"
+          className="mt-sm inline-block text-primary hover:text-primary-hover"
+        >
           View Full About →
         </Link>
       </section>

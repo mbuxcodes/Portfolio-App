@@ -30,6 +30,11 @@ adminProjectRouter.get(
   isAuthenticated,
   asyncHandler(projectController.getAllProjectsForAdmin),
 );
+adminProjectRouter.get(
+  "/:id",
+  isAuthenticated,
+  asyncHandler(projectController.getProjectByIdForAdmin),
+);
 adminProjectRouter.post(
   "/",
   isAuthenticated,
