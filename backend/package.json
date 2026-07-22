@@ -30,7 +30,6 @@
     "morgan": "^1.11.0",
     "multer": "^2.2.0",
     "sanitize-html": "^2.17.6",
-    "slugify": "^1.6.9",
     "zod": "^4.4.3"
   },
   "devDependencies": {
