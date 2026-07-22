@@ -4,13 +4,15 @@ const aboutContentSchema = new mongoose.Schema(
   {
     headline: {
       type: String,
-      required: [true, "Headline is required"],
+      default: "",
       trim: true,
     },
     bio: {
+      // Deliberately NOT required, unlike most text fields elsewhere in this
+      // codebase — see the note below and Architecture Doc 2's Implementation
+      // Notes for why.
       type: String,
-      required: [true, "Bio is required"],
-      minlength: [20, "Bio should be at least 20 characters"],
+      default: "",
     },
     profileImage: {
       type: String,

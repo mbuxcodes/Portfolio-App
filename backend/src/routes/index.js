@@ -2,6 +2,7 @@ import { Router } from "express";
 import authRoutes from "./auth.routes.js";
 import { publicProjectRouter, adminProjectRouter } from "./project.routes.js";
 import { publicSkillRouter, adminSkillRouter } from "./skill.routes.js";
+import { publicAboutRouter, adminAboutRouter } from "./aboutContent.routes.js";
 
 const router = Router();
 
@@ -10,5 +11,7 @@ router.use("/projects", publicProjectRouter);
 router.use("/admin/projects", adminProjectRouter);
 router.use("/skills", publicSkillRouter);
 router.use("/admin/skills", adminSkillRouter);
+router.use("/about", publicAboutRouter);
+router.use("/admin/about", adminAboutRouter);
 
 export default router;
