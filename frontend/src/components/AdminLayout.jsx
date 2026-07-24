@@ -9,6 +9,8 @@ const adminNavLinks = [
   { label: "Dashboard", to: "/admin" },
   { label: "Projects", to: "/admin/projects" },
   { label: "Skills", to: "/admin/skills" },
+  { label: "Experience", to: "/admin/experience" },
+  { label: "Education", to: "/admin/education" },
   { label: "About", to: "/admin/about" },
   { label: "Messages", to: "/admin/messages" },
   { label: "Resume", to: "/admin/resume" },
