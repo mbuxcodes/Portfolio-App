@@ -11,6 +11,7 @@ import {
   publicEducationRouter,
   adminEducationRouter,
 } from "./education.routes.js";
+import { publicMessageRouter, adminMessageRouter } from "./message.routes.js";
 
 const router = Router();
 
@@ -25,5 +26,7 @@ router.use("/experiences", publicExperienceRouter);
 router.use("/admin/experiences", adminExperienceRouter);
 router.use("/education", publicEducationRouter);
 router.use("/admin/education", adminEducationRouter);
+router.use("/messages", publicMessageRouter);
+router.use("/admin/messages", adminMessageRouter);
 
 export default router;
