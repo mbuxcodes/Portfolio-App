@@ -1,14 +1,18 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useLogoutMutation, useGetCsrfTokenQuery } from '@/features/auth/authApi';
-import Button from '@/components/Button';
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import {
+  useLogoutMutation,
+  useGetCsrfTokenQuery,
+} from "@/features/auth/authApi";
+import Button from "@/components/Button";
 
 const adminNavLinks = [
-  { label: 'Dashboard', to: '/admin' },
-  { label: 'Projects', to: '/admin/projects' },
-  { label: 'About', to: '/admin/about' },
-  { label: 'Messages', to: '/admin/messages' },
-  { label: 'Resume', to: '/admin/resume' },
-  { label: 'Social Links', to: '/admin/social-links' },
+  { label: "Dashboard", to: "/admin" },
+  { label: "Projects", to: "/admin/projects" },
+  { label: "Skills", to: "/admin/skills" },
+  { label: "About", to: "/admin/about" },
+  { label: "Messages", to: "/admin/messages" },
+  { label: "Resume", to: "/admin/resume" },
+  { label: "Social Links", to: "/admin/social-links" },
 ];
 
 function AdminLayout() {
@@ -21,7 +25,7 @@ function AdminLayout() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/admin/login');
+    navigate("/admin/login");
   };
 
   return (
@@ -34,10 +38,12 @@ function AdminLayout() {
               <NavLink
                 key={link.to}
                 to={link.to}
-                end={link.to === '/admin'}
+                end={link.to === "/admin"}
                 className={({ isActive }) =>
                   `rounded-[--radius] px-sm py-2 text-small font-medium transition-colors ${
-                    isActive ? 'bg-primary text-primary-foreground' : 'text-muted hover:bg-border/50'
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted hover:bg-border/50"
                   }`
                 }
               >

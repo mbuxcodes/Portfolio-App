@@ -1,19 +1,68 @@
 import { apiSlice } from "@/api/apiSlice";
 
 /**
- * Minimal by design: only getSkills exists here right now, because Project's
- * create/edit form genuinely needs the real skill list for its techStack
- * selector. Skills' own admin CRUD integration (create/update/delete
- * endpoints) is a separate future step — when that happens, this same file
- * gets extended, not duplicated.
+ * Extended from its Step 2 minimal form (getSkills only) — same file, not a
+ * duplicate, per DRY. Now includes the full admin CRUD surface needed for
+ * AdminSkillsPage (added this step to close the missing-route gap).
  */
 export const skillsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getSkills: builder.query({
       query: () => "/skills",
-      providesTags: ["Skill"],
+      providesTags: (result) =>
+        result?.data
+          ? [
+              ...result.data.map(({ _id }) => ({ type: "Skill", id: _id })),
+              { type: "Skill", id: "LIST" },
+            ]
+          : [{ type: "Skill", id: "LIST" }],
+    }),
+
+    createSkill: builder.mutation({
+      query: (body) => ({
+        url: "/admin/skills",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Skill", id: "LIST" }],
+    }),
+
+    updateSkill: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/admin/skills/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Skill", id },
+        { type: "Skill", id: "LIST" },
+      ],
+    }),
+
+    deleteSkill: builder.mutation({
+      // `force` is undefined on the first attempt (safety check), and true
+      // on the admin's explicit confirm-anyway retry — matching the
+      // backend's ?force=true delete-safety mechanism exactly.
+      query: ({ id, force }) => ({
+        url: `/admin/skills/${id}${force ? "?force=true" : ""}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Skill", id },
+        { type: "Skill", id: "LIST" },
+        // A forced delete never cascades on the backend, but any Project or
+        // Experience that referenced this skill now has a dangling ID —
+        // invalidating their lists keeps their cached techStack display honest.
+        { type: "Project", id: "LIST" },
+        { type: "Experience", id: "LIST" },
+      ],
     }),
   }),
 });
 
-export const { useGetSkillsQuery } = skillsApi;
+export const {
+  useGetSkillsQuery,
+  useCreateSkillMutation,
+  useUpdateSkillMutation,
+  useDeleteSkillMutation,
+} = skillsApi;

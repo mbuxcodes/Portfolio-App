@@ -15,6 +15,7 @@ import AdminLoginPage from "@/pages/admin/AdminLoginPage";
 import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
 import AdminProjectsPage from "@/pages/admin/AdminProjectsPage";
 import AdminProjectFormPage from "@/pages/admin/AdminProjectFormPage";
+import AdminSkillsPage from "@/pages/admin/AdminSkillsPage";
 import AdminAboutPage from "@/pages/admin/AdminAboutPage";
 import AdminMessagesPage from "@/pages/admin/AdminMessagesPage";
 import AdminResumePage from "@/pages/admin/AdminResumePage";
@@ -50,6 +51,7 @@ export const router = createBrowserRouter([
           { path: "projects", element: <AdminProjectsPage /> },
           { path: "projects/new", element: <AdminProjectFormPage /> },
           { path: "projects/:id/edit", element: <AdminProjectFormPage /> },
+          { path: "skills", element: <AdminSkillsPage /> },
           { path: "about", element: <AdminAboutPage /> },
           { path: "messages", element: <AdminMessagesPage /> },
           { path: "resume", element: <AdminResumePage /> },
