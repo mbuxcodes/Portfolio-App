@@ -61,9 +61,10 @@ export const skillService = {
 
   /**
    * Per Architecture Doc 3: deleting a Skill referenced by existing Projects
-   * (or Experience — see TODO below) must not silently cascade-delete those
-   * references, nor silently proceed. The admin must be warned with a count
-   * and explicitly confirm via ?force=true before the delete proceeds.
+   * or Experience must not silently cascade-delete those references, nor
+   * silently proceed. The admin must be warned with a count and explicitly
+   * confirm via ?force=true before the delete proceeds. (Both Project and
+   * Experience reference-checking are complete — see Backend Step 6.)
    */
   async deleteSkill(id, { force = false } = {}) {
     const existing = await skillRepository.findById(id);

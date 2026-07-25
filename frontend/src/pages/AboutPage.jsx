@@ -6,6 +6,7 @@ import Card from "@/components/Card";
 import Badge from "@/components/Badge";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorState from "@/components/ErrorState";
+import PageMeta from "@/components/PageMeta";
 
 function AboutPage() {
   const {
@@ -28,6 +29,7 @@ function AboutPage() {
 
   return (
     <div className="mx-auto max-w-[1200px] px-md py-xl">
+      <PageMeta title="About" description={about?.bio} />
       <section className="pb-xl">
         {isLoadingAbout && <LoadingSpinner label="Loading about content" />}
         {isAboutError && (
