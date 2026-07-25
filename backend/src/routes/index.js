@@ -12,6 +12,11 @@ import {
   adminEducationRouter,
 } from "./education.routes.js";
 import { publicMessageRouter, adminMessageRouter } from "./message.routes.js";
+import { publicResumeRouter, adminResumeRouter } from "./resume.routes.js";
+import {
+  publicSocialLinkRouter,
+  adminSocialLinkRouter,
+} from "./socialLink.routes.js";
 
 const router = Router();
 
@@ -28,5 +33,9 @@ router.use("/education", publicEducationRouter);
 router.use("/admin/education", adminEducationRouter);
 router.use("/messages", publicMessageRouter);
 router.use("/admin/messages", adminMessageRouter);
+router.use("/resume", publicResumeRouter);
+router.use("/admin/resume", adminResumeRouter);
+router.use("/social-links", publicSocialLinkRouter);
+router.use("/admin/social-links", adminSocialLinkRouter);
 
 export default router;

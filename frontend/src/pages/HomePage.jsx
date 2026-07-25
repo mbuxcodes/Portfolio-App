@@ -3,9 +3,11 @@ import Button from "@/components/Button";
 import Card from "@/components/Card";
 import Badge from "@/components/Badge";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import PageMeta from "@/components/PageMeta";
 import { useGetProjectsQuery } from "@/features/projects/projectsApi";
 import { useGetSkillsQuery } from "@/features/skills/skillsApi";
 import { useGetAboutQuery } from "@/features/about/aboutApi";
+import { useGetResumeQuery } from "@/features/resume/resumeApi";
 
 function HomePage() {
   const { data: projectsResponse, isLoading: isLoadingProjects } =
@@ -13,6 +15,9 @@ function HomePage() {
   const { data: skillsResponse, isLoading: isLoadingSkills } =
     useGetSkillsQuery();
   const { data: aboutResponse, isLoading: isLoadingAbout } = useGetAboutQuery();
+  const { data: resumeResponse } = useGetResumeQuery();
+
+  const resumeUrl = resumeResponse?.data?.url;
 
   const featuredProjects = (projectsResponse?.data || []).filter(
     (project) => project.featured,
@@ -21,6 +26,7 @@ function HomePage() {
   const about = aboutResponse?.data;
   return (
     <div className="mx-auto max-w-[1200px] px-md">
+      <PageMeta description={about?.bio} />
       {/* Hero */}
       <section className="flex flex-col items-start gap-sm py-2xl">
         <h1 className="text-display font-bold">Your Name</h1>
@@ -29,8 +35,11 @@ function HomePage() {
           production-grade web applications, end to end.
         </p>
         <div className="flex gap-sm pt-sm">
-          {/* TODO (Milestone 2): wire to real resume URL from /api/resume */}
-          <Button variant="primary">Download Resume</Button>
+          {resumeUrl && (
+            <a href={resumeUrl} target="_blank" rel="noreferrer">
+              <Button variant="primary">Download Resume</Button>
+            </a>
+          )}
           <Link to="/contact">
             <Button variant="secondary">Contact Me</Button>
           </Link>

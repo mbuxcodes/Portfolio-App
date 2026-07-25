@@ -1,6 +1,7 @@
 import AppError from "../utils/AppError.js";
 import { error as sendError } from "../utils/responseEnvelope.js";
 import { env } from "../config/env.js";
+import multer from "multer";
 
 /**
  * Centralized error handler. Every controller can simply `throw` (or pass
@@ -43,6 +44,21 @@ export function errorHandlerMiddleware(err, req, res, next) {
       message: `A record with this ${field} already exists`,
       statusCode: 409,
       errorCode: "DUPLICATE_KEY",
+    });
+  }
+
+  // Multer errors (file too large, unexpected field name, etc.) — these are
+  // client errors (400), not server errors, even though Multer itself
+  // doesn't extend our AppError class.
+  if (err instanceof multer.MulterError) {
+    const message =
+      err.code === "LIMIT_FILE_SIZE"
+        ? "File is too large."
+        : `Upload error: ${err.message}`;
+    return sendError(res, {
+      message,
+      statusCode: 400,
+      errorCode: "UPLOAD_ERROR",
     });
   }
 
