@@ -9,6 +9,23 @@ import { errorHandlerMiddleware } from "./middleware/errorHandler.middleware.js"
 
 const app = express();
 
+/**
+ * Render (and virtually every PaaS: Vercel, Heroku, Railway) sits exactly
+ * one reverse proxy in front of this app in production. Without this
+ * setting, Express's req.ip ignores the X-Forwarded-For header entirely
+ * and returns the proxy's own IP for every request — meaning every visitor
+ * would appear identical to express-rate-limit, and one person's login
+ * attempts or contact form submissions would rate-limit everyone else too.
+ * `1` (not `true`) means "trust exactly one hop" — the precise, secure
+ * setting for our known single-proxy topology, not "trust any forwarded
+ * header from anywhere" which would allow IP spoofing if ever misconfigured.
+ * Scoped to production only — local dev has no reverse proxy, so trusting
+ * one here would be meaningless at best.
+ */
+if (env.nodeEnv === "production") {
+  app.set("trust proxy", 1);
+}
+
 // Security headers on every response
 app.use(helmet());
 
