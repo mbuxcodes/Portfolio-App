@@ -44,7 +44,7 @@ function AboutPage() {
             {about.profileImage && (
               <img
                 src={about.profileImage}
-                alt="Profile"
+                alt={about.profileImageAlt || "Profile photo"}
                 className="mb-md h-32 w-32 rounded-full object-cover"
               />
             )}

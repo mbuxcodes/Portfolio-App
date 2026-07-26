@@ -58,7 +58,7 @@ function ProjectDetailPage() {
 
       <img
         src={project.coverImage}
-        alt={`${project.title} cover`}
+        alt={project.coverImageAlt}
         className="mb-lg h-64 w-full rounded-[--radius] bg-surface object-cover"
       />
 

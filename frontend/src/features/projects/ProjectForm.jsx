@@ -28,6 +28,7 @@ const emptyFormState = {
   category: "Personal",
   techStack: [],
   coverImage: "",
+  coverImageAlt: "",
   gallery: "",
   problem: "",
   solution: "",
@@ -64,6 +65,7 @@ function ProjectForm({ initialData = null }) {
         category: initialData.category,
         techStack: initialData.techStack.map((skill) => skill._id),
         coverImage: initialData.coverImage,
+        coverImageAlt: initialData.coverImageAlt,
         gallery: initialData.gallery.join(", "),
         problem: initialData.problem,
         solution: initialData.solution,
@@ -195,6 +197,17 @@ function ProjectForm({ initialData = null }) {
         value={formData.coverImage}
         onChange={handleChange}
         error={errors.coverImage}
+      />
+
+      <Input
+        id="coverImageAlt"
+        name="coverImageAlt"
+        label="Cover Image Alt Text"
+        required
+        helperText="Describe what the image shows, for visitors using screen readers — e.g. 'Dashboard showing real-time analytics charts'."
+        value={formData.coverImageAlt}
+        onChange={handleChange}
+        error={errors.coverImageAlt}
       />
 
       <Input

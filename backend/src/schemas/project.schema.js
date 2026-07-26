@@ -21,6 +21,9 @@ export const createProjectSchema = z.object({
     .array(z.string().regex(objectIdRegex, "Invalid skill ID"))
     .min(1, "At least one technology must be selected"),
   coverImage: z.string().min(1, "Cover image is required"),
+  coverImageAlt: z
+    .string()
+    .min(1, "Cover image alt text is required for accessibility"),
   gallery: z.array(z.string()).optional().default([]),
   problem: z
     .string()

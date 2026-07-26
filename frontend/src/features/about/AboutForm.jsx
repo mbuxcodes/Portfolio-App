@@ -13,6 +13,7 @@ const emptyFormState = {
   headline: "",
   bio: "",
   profileImage: "",
+  profileImageAlt: "",
   highlights: "",
 };
 
@@ -44,6 +45,7 @@ function AboutForm() {
         headline: about.headline,
         bio: about.bio,
         profileImage: about.profileImage || "",
+        profileImageAlt: about.profileImageAlt || "",
         highlights: (about.highlights || []).join(", "),
       });
     }
@@ -126,6 +128,15 @@ function AboutForm() {
         label="Profile Image URL"
         helperText="Paste a hosted image URL — a dedicated upload widget is a future enhancement."
         value={formData.profileImage}
+        onChange={handleChange}
+      />
+
+      <Input
+        id="profileImageAlt"
+        name="profileImageAlt"
+        label="Profile Image Alt Text"
+        helperText="Describe the photo for screen reader users — e.g. 'Portrait photo of Jane Doe'."
+        value={formData.profileImageAlt}
         onChange={handleChange}
       />
 

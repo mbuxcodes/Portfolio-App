@@ -13,5 +13,6 @@ export const updateAboutContentSchema = z.object({
     .max(150, "Headline must be at most 150 characters"),
   bio: z.string().min(20, "Bio should be at least 20 characters"),
   profileImage: z.string().optional(),
+  profileImageAlt: z.string().optional(),
   highlights: z.array(z.string()).optional().default([]),
 });

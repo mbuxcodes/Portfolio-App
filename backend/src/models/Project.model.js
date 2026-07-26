@@ -38,6 +38,10 @@ const projectSchema = new mongoose.Schema(
       type: String,
       required: [true, "Cover image is required"],
     },
+    coverImageAlt: {
+      type: String,
+      required: [true, "Cover image alt text is required for accessibility"],
+    },
     gallery: {
       type: [String],
       default: [],

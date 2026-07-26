@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
-import Button from '@/components/Button';
+import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+import Button from "@/components/Button";
 
 /**
  * Used for admin delete-confirmation dialogs and any future confirm/edit
@@ -20,17 +20,41 @@ function Modal({ isOpen, onClose, title, children, footer }) {
     dialogRef.current?.focus();
 
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
+        return;
+      }
+
+      // Real focus trap: Tab/Shift+Tab cycle only within this modal's
+      // focusable elements, never escaping into the page behind it.
+      // Without this, a keyboard-only user could Tab past the modal's
+      // last button into content that's visually hidden behind the
+      // backdrop but still technically in the DOM and focusable.
+      if (event.key === "Tab") {
+        const focusableElements = dialogRef.current?.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        if (!focusableElements || focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey && document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        } else if (!event.shiftKey && document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        }
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden';
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
       previouslyFocusedElement.current?.focus();
     };
   }, [isOpen, onClose]);
@@ -65,7 +89,7 @@ function Modal({ isOpen, onClose, title, children, footer }) {
         )}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 
