@@ -24,7 +24,10 @@ export function issueCsrfToken(req, res) {
   res.cookie(CSRF_COOKIE_NAME, token, {
     httpOnly: false, // must be readable... but we don't rely on JS reading it; see note above
     secure: env.nodeEnv === "production",
-    sameSite: "strict",
+    // Same cross-domain reasoning as auth.controller.js's COOKIE_OPTIONS:
+    // 'none' in production (frontend/backend are different domains),
+    // 'lax' in local dev (same registrable domain, different ports only).
+    sameSite: env.nodeEnv === "production" ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   });
 

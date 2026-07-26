@@ -3,10 +3,23 @@ import { issueCsrfToken } from "../middleware/csrf.middleware.js";
 import { success } from "../utils/responseEnvelope.js";
 import { env } from "../config/env.js";
 
+/**
+ * SameSite must be 'none' in production, not 'strict' — our frontend
+ * (Vercel) and backend (Render) are on entirely different domains, making
+ * every request genuinely cross-site. 'strict' (or even 'lax') blocks
+ * cookies on cross-site fetch/XHR entirely, which would silently break
+ * all authentication the moment this is deployed. 'none' requires
+ * `secure: true` to be paired with it (browsers reject SameSite=None
+ * without Secure) — already true in production via the existing setting.
+ * 'lax' remains correct for local dev, where frontend/backend share the
+ * same registrable domain (localhost) despite different ports, making
+ * them same-site — which is also why this bug was invisible in every
+ * local test we've run so far.
+ */
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: env.nodeEnv === "production",
-  sameSite: "strict",
+  sameSite: env.nodeEnv === "production" ? "none" : "lax",
   maxAge: env.jwtCookieExpiresInDays * 24 * 60 * 60 * 1000,
 };
 
