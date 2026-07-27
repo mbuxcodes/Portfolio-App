@@ -3,9 +3,11 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import morgan from "morgan";
+import mongoose from "mongoose";
 import { env } from "./config/env.js";
 import routes from "./routes/index.js";
 import { errorHandlerMiddleware } from "./middleware/errorHandler.middleware.js";
+import { success, error } from "./utils/responseEnvelope.js";
 
 const app = express();
 
@@ -44,11 +46,33 @@ if (env.nodeEnv === "development") {
   app.use(morgan("dev"));
 }
 
+/**
+ * Production-grade health check — verifies actual application health, not
+ * just "the process is running." Render (and any monitoring/uptime tool)
+ * uses this to decide whether to route traffic to this instance or restart
+ * it. The previous version returned 200 unconditionally, meaning a broken
+ * MongoDB connection (wrong credentials, Atlas outage, network partition)
+ * would still report "healthy" — Render would happily route real visitor
+ * traffic to an instance where every single data-backed feature is broken.
+ *
+ * mongoose.connection.readyState: 0 = disconnected, 1 = connected,
+ * 2 = connecting, 3 = disconnecting. Only 1 is genuinely healthy — 2 and 3
+ * are transient/degraded states that shouldn't be reported as "ok" either.
+ */
 app.get("/api/health", (req, res) => {
-  res.json({
-    success: true,
-    data: { status: "ok" },
-    message: "Server is running",
+  const isDatabaseConnected = mongoose.connection.readyState === 1;
+
+  if (!isDatabaseConnected) {
+    return error(res, {
+      message: "Database is not connected",
+      statusCode: 503,
+      errorCode: "DATABASE_UNAVAILABLE",
+    });
+  }
+
+  return success(res, {
+    data: { status: "ok", database: "connected" },
+    message: "Server is healthy",
   });
 });
 
