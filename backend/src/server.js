@@ -59,6 +59,32 @@ async function startServer() {
 
   process.on("SIGTERM", () => shutdown("SIGTERM"));
   process.on("SIGINT", () => shutdown("SIGINT"));
+
+  /**
+   * On Node 15+, an unhandled promise rejection crashes the process
+   * immediately by default — not a warning, an actual termination. Without
+   * these handlers, that crash bypasses shutdown() entirely: no grace
+   * window for in-flight requests, no clean MongoDB disconnect, just an
+   * abrupt death. A single bug anywhere (a missed .catch(), an async
+   * callback outside our asyncHandler wrapper) would otherwise drop every
+   * in-flight request instantly, not just the one connected to the bug.
+   *
+   * Deliberately reusing the same shutdown() function already built and
+   * verified for SIGTERM/SIGINT (DRY) — the cleanup logic is identical
+   * regardless of *why* the process needs to stop. We log the full error
+   * first (our only observability today, per the Phase 21 decision to
+   * defer Sentry) so the cause is visible before the process exits, since
+   * once shutdown() completes there's no second chance to inspect it.
+   */
+  process.on("uncaughtException", (err) => {
+    console.error("Uncaught exception:", err);
+    shutdown("uncaughtException");
+  });
+
+  process.on("unhandledRejection", (reason) => {
+    console.error("Unhandled promise rejection:", reason);
+    shutdown("unhandledRejection");
+  });
 }
 
 startServer();
