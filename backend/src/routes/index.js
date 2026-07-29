@@ -17,6 +17,7 @@ import {
   publicSocialLinkRouter,
   adminSocialLinkRouter,
 } from "./socialLink.routes.js";
+import { adminUploadRouter } from "./upload.routes.js";
 
 const router = Router();
 
@@ -37,5 +38,6 @@ router.use("/resume", publicResumeRouter);
 router.use("/admin/resume", adminResumeRouter);
 router.use("/social-links", publicSocialLinkRouter);
 router.use("/admin/social-links", adminSocialLinkRouter);
+router.use("/admin/upload", adminUploadRouter);
 
 export default router;

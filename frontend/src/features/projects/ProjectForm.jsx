@@ -10,6 +10,8 @@ import TextArea from "@/components/TextArea";
 import Select from "@/components/Select";
 import Button from "@/components/Button";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import ImageUploader from "@/components/ImageUploader";
+import ImagePreview from "@/components/ImagePreview";
 
 const categoryOptions = [
   { value: "Personal", label: "Personal" },
@@ -29,7 +31,7 @@ const emptyFormState = {
   techStack: [],
   coverImage: "",
   coverImageAlt: "",
-  gallery: "",
+  gallery: [],
   problem: "",
   solution: "",
   results: "",
@@ -66,7 +68,7 @@ function ProjectForm({ initialData = null }) {
         techStack: initialData.techStack.map((skill) => skill._id),
         coverImage: initialData.coverImage,
         coverImageAlt: initialData.coverImageAlt,
-        gallery: initialData.gallery.join(", "),
+        gallery: initialData.gallery,
         problem: initialData.problem,
         solution: initialData.solution,
         results: initialData.results,
@@ -96,18 +98,27 @@ function ProjectForm({ initialData = null }) {
     }));
   };
 
+  const handleCoverImageUploadSuccess = (url) => {
+    setFormData((prev) => ({ ...prev, coverImage: url }));
+  };
+
+  const handleGalleryImageAdd = (url) => {
+    setFormData((prev) => ({ ...prev, gallery: [...prev.gallery, url] }));
+  };
+
+  const handleGalleryImageRemove = (indexToRemove) => {
+    setFormData((prev) => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, index) => index !== indexToRemove),
+    }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setErrors({});
     setSubmitError(null);
 
-    const payload = {
-      ...formData,
-      gallery: formData.gallery
-        .split(",")
-        .map((url) => url.trim())
-        .filter(Boolean),
-    };
+    const payload = { ...formData };
 
     try {
       if (isEditMode) {
@@ -188,16 +199,16 @@ function ProjectForm({ initialData = null }) {
         )}
       </div>
 
-      <Input
-        id="coverImage"
-        name="coverImage"
-        label="Cover Image URL"
+      <ImageUploader
+        label="Cover Image"
         required
-        helperText="Paste a hosted image URL — a dedicated upload widget is a future enhancement."
-        value={formData.coverImage}
-        onChange={handleChange}
-        error={errors.coverImage}
+        currentImageUrl={formData.coverImage}
+        currentImageAlt={formData.coverImageAlt}
+        onUploadSuccess={handleCoverImageUploadSuccess}
       />
+      {errors.coverImage && (
+        <p className="text-small text-danger">{errors.coverImage}</p>
+      )}
 
       <Input
         id="coverImageAlt"
@@ -210,13 +221,29 @@ function ProjectForm({ initialData = null }) {
         error={errors.coverImageAlt}
       />
 
-      <Input
-        id="gallery"
-        name="gallery"
-        label="Gallery Image URLs (comma-separated)"
-        value={formData.gallery}
-        onChange={handleChange}
-      />
+      <div className="flex flex-col gap-sm">
+        <label className="text-small font-medium text-foreground">
+          Gallery Images
+        </label>
+        {formData.gallery.length > 0 && (
+          <div className="flex flex-wrap gap-sm">
+            {formData.gallery.map((url, index) => (
+              <ImagePreview
+                key={url}
+                src={url}
+                alt={`Gallery image ${index + 1}`}
+                onRemove={() => handleGalleryImageRemove(index)}
+                size="sm"
+              />
+            ))}
+          </div>
+        )}
+        <ImageUploader
+          key={formData.gallery.length}
+          label="Add Gallery Image"
+          onUploadSuccess={handleGalleryImageAdd}
+        />
+      </div>
 
       <TextArea
         id="problem"

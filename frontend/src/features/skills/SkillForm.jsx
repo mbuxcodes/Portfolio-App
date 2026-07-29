@@ -7,6 +7,7 @@ import Input from "@/components/Input";
 import TextArea from "@/components/TextArea";
 import Select from "@/components/Select";
 import Button from "@/components/Button";
+import ImageUploader from "@/components/ImageUploader";
 
 const categoryOptions = [
   { value: "Frontend", label: "Frontend" },
@@ -62,6 +63,10 @@ function SkillForm({ initialData = null, onSuccess, onCancel }) {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleIconUploadSuccess = (url) => {
+    setFormData((prev) => ({ ...prev, icon: url }));
   };
 
   const handleSubmit = async (event) => {
@@ -133,12 +138,12 @@ function SkillForm({ initialData = null, onSuccess, onCancel }) {
         error={errors.narrative}
       />
 
-      <Input
-        id="icon"
-        name="icon"
-        label="Icon URL (optional)"
-        value={formData.icon}
-        onChange={handleChange}
+      <ImageUploader
+        label="Icon"
+        currentImageUrl={formData.icon}
+        currentImageAlt={`${formData.name} icon`}
+        onUploadSuccess={handleIconUploadSuccess}
+        previewSize="sm"
       />
 
       {submitError && (

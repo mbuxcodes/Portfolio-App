@@ -8,6 +8,7 @@ import TextArea from "@/components/TextArea";
 import Button from "@/components/Button";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorState from "@/components/ErrorState";
+import ImageUploader from "@/components/ImageUploader";
 
 const emptyFormState = {
   headline: "",
@@ -54,6 +55,11 @@ function AboutForm() {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setSaveSuccess(false);
+  };
+
+  const handleProfileImageUploadSuccess = (url) => {
+    setFormData((prev) => ({ ...prev, profileImage: url }));
     setSaveSuccess(false);
   };
 
@@ -122,13 +128,11 @@ function AboutForm() {
         error={errors.bio}
       />
 
-      <Input
-        id="profileImage"
-        name="profileImage"
-        label="Profile Image URL"
-        helperText="Paste a hosted image URL — a dedicated upload widget is a future enhancement."
-        value={formData.profileImage}
-        onChange={handleChange}
+      <ImageUploader
+        label="Profile Image"
+        currentImageUrl={formData.profileImage}
+        currentImageAlt={formData.profileImageAlt}
+        onUploadSuccess={handleProfileImageUploadSuccess}
       />
 
       <Input
