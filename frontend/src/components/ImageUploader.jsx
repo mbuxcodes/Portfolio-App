@@ -14,6 +14,11 @@ export const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB, matching the backen
  * constraints exactly, so obviously-invalid files are rejected instantly
  * rather than after a wasted round trip — the backend remains the actual
  * source of truth/enforcement, this is a fast-feedback UX layer on top.
+ *
+ * `onUploadSuccess({ url, publicId })` — both are required by every caller
+ * now (Phase 3 — Cloudinary Asset Lifecycle Management): `publicId` must be
+ * persisted alongside `url` so a later replace/delete can target the exact
+ * Cloudinary asset to clean up.
  */
 function ImageUploader({
   label,
@@ -50,7 +55,7 @@ function ImageUploader({
     try {
       const result = await uploadImage(formData).unwrap();
       setPreviewUrl(result.data.url);
-      onUploadSuccess(result.data.url);
+      onUploadSuccess({ url: result.data.url, publicId: result.data.publicId });
     } catch (err) {
       setError(err?.data?.message || "Upload failed. Please try again.");
     } finally {

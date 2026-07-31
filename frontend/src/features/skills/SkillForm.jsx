@@ -30,6 +30,7 @@ const emptyFormState = {
   proficiency: "Intermediate",
   narrative: "",
   icon: "",
+  iconPublicId: "",
 };
 
 /**
@@ -56,6 +57,7 @@ function SkillForm({ initialData = null, onSuccess, onCancel }) {
         proficiency: initialData.proficiency,
         narrative: initialData.narrative,
         icon: initialData.icon || "",
+        iconPublicId: initialData.iconPublicId || "",
       });
     }
   }, [initialData]);
@@ -65,8 +67,8 @@ function SkillForm({ initialData = null, onSuccess, onCancel }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleIconUploadSuccess = (url) => {
-    setFormData((prev) => ({ ...prev, icon: url }));
+  const handleIconUploadSuccess = ({ url, publicId }) => {
+    setFormData((prev) => ({ ...prev, icon: url, iconPublicId: publicId }));
   };
 
   const handleSubmit = async (event) => {

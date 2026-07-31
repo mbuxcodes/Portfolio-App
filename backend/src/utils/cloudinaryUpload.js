@@ -45,3 +45,34 @@ export function uploadBufferToCloudinary(
     uploadStream.end(buffer);
   });
 }
+
+/**
+ * Reusable asset deletion, paired with the upload function above (Phase 3 —
+ * Cloudinary Asset Lifecycle Management). Deliberately swallows errors
+ * rather than throwing: a failed deletion means an orphaned asset (a
+ * storage-quota cost), which is a strictly lesser problem than failing an
+ * otherwise-successful Project/Skill/About update or delete because
+ * Cloudinary's cleanup step had a transient hiccup. Callers should log the
+ * outcome, not treat it as blocking.
+ *
+ * @param {string} publicId
+ * @param {string} [resourceType='image'] - must match what the asset was
+ *   originally uploaded as ('image' or 'raw')
+ * @returns {Promise<boolean>} true if deletion succeeded, false otherwise
+ */
+export async function deleteCloudinaryAsset(publicId, resourceType = "image") {
+  if (!publicId) return false;
+
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType,
+    });
+    return result.result === "ok";
+  } catch (err) {
+    console.error(
+      `Failed to delete Cloudinary asset ${publicId}:`,
+      err.message,
+    );
+    return false;
+  }
+}

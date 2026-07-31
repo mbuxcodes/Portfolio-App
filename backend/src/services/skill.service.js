@@ -2,6 +2,7 @@ import { skillRepository } from "../repositories/skill.repository.js";
 import { projectRepository } from "../repositories/project.repository.js";
 import { experienceRepository } from "../repositories/experience.repository.js";
 import { sanitizeRichText } from "../utils/sanitizeHtml.js";
+import { deleteCloudinaryAsset } from "../utils/cloudinaryUpload.js";
 import AppError from "../utils/AppError.js";
 
 export const skillService = {
@@ -56,7 +57,18 @@ export const skillService = {
       sanitizedData.narrative = sanitizeRichText(sanitizedData.narrative);
     }
 
-    return skillRepository.updateById(id, sanitizedData);
+    const isIconReplaced =
+      data.iconPublicId &&
+      existing.iconPublicId &&
+      data.iconPublicId !== existing.iconPublicId;
+
+    const updated = await skillRepository.updateById(id, sanitizedData);
+
+    if (isIconReplaced) {
+      await deleteCloudinaryAsset(existing.iconPublicId);
+    }
+
+    return updated;
   },
 
   /**
@@ -87,6 +99,14 @@ export const skillService = {
       );
     }
 
-    return skillRepository.deleteById(id);
+    const deleted = await skillRepository.deleteById(id);
+
+    // Only reached once the delete has actually succeeded — either there
+    // were no references, or the admin explicitly confirmed force=true.
+    if (existing.iconPublicId) {
+      await deleteCloudinaryAsset(existing.iconPublicId);
+    }
+
+    return deleted;
   },
 };

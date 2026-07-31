@@ -24,6 +24,7 @@ export const createSkillSchema = z.object({
   proficiency: proficiencyEnum,
   narrative: z.string().min(20, "Narrative should be at least 20 characters"),
   icon: z.string().optional(),
+  iconPublicId: z.string().optional(),
   order: z.number().optional(),
 });
 

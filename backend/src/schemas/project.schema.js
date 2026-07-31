@@ -21,10 +21,19 @@ export const createProjectSchema = z.object({
     .array(z.string().regex(objectIdRegex, "Invalid skill ID"))
     .min(1, "At least one technology must be selected"),
   coverImage: z.string().min(1, "Cover image is required"),
+  coverImagePublicId: z.string().min(1, "Cover image public ID is required"),
   coverImageAlt: z
     .string()
     .min(1, "Cover image alt text is required for accessibility"),
-  gallery: z.array(z.string()).optional().default([]),
+  gallery: z
+    .array(
+      z.object({
+        url: z.string().min(1),
+        publicId: z.string().min(1),
+      }),
+    )
+    .optional()
+    .default([]),
   problem: z
     .string()
     .min(20, "Problem description should be at least 20 characters"),

@@ -1,6 +1,7 @@
 import { projectRepository } from "../repositories/project.repository.js";
 import { slugify } from "../utils/slugify.js";
 import { sanitizeRichText } from "../utils/sanitizeHtml.js";
+import { deleteCloudinaryAsset } from "../utils/cloudinaryUpload.js";
 import AppError from "../utils/AppError.js";
 
 /**
@@ -86,14 +87,64 @@ export const projectService = {
       sanitizedData.slug = await generateUniqueSlug(data.title);
     }
 
-    return projectRepository.updateById(id, sanitizedData);
+    // Determine what (if anything) needs Cloudinary cleanup BEFORE writing
+    // to the DB — but don't actually delete yet. The DB write must succeed
+    // first: if we deleted the old asset before confirming the update
+    // landed, a failed update would leave the project pointing at a URL
+    // for an asset that no longer exists.
+    const isCoverImageReplaced =
+      data.coverImagePublicId &&
+      existingProject.coverImagePublicId &&
+      data.coverImagePublicId !== existingProject.coverImagePublicId;
+
+    const removedGalleryPublicIds = data.gallery
+      ? existingProject.gallery
+          .filter(
+            (oldItem) =>
+              !data.gallery.some(
+                (newItem) => newItem.publicId === oldItem.publicId,
+              ),
+          )
+          .map((item) => item.publicId)
+      : [];
+
+    const updatedProject = await projectRepository.updateById(
+      id,
+      sanitizedData,
+    );
+
+    // Cleanup happens after the DB write succeeds, and failures here are
+    // deliberately non-blocking (deleteCloudinaryAsset swallows its own
+    // errors and logs them) — an orphaned asset is a lesser problem than
+    // failing a successful project update over a Cloudinary hiccup.
+    if (isCoverImageReplaced) {
+      await deleteCloudinaryAsset(existingProject.coverImagePublicId);
+    }
+    for (const publicId of removedGalleryPublicIds) {
+      await deleteCloudinaryAsset(publicId);
+    }
+
+    return updatedProject;
   },
 
   async deleteProject(id) {
-    const deleted = await projectRepository.deleteById(id);
-    if (!deleted) {
+    const existingProject = await projectRepository.findById(id);
+    if (!existingProject) {
       throw new AppError("Project not found", 404, "NOT_FOUND");
     }
-    return deleted;
+
+    await projectRepository.deleteById(id);
+
+    // Same non-blocking cleanup principle as updateProject: the DB record
+    // is already gone at this point, so a Cloudinary failure here only
+    // means an orphaned asset, not an inconsistent database state.
+    if (existingProject.coverImagePublicId) {
+      await deleteCloudinaryAsset(existingProject.coverImagePublicId);
+    }
+    for (const item of existingProject.gallery) {
+      await deleteCloudinaryAsset(item.publicId);
+    }
+
+    return existingProject;
   },
 };

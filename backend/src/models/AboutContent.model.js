@@ -18,6 +18,10 @@ const aboutContentSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    profileImagePublicId: {
+      type: String,
+      default: null,
+    },
     profileImageAlt: {
       type: String,
       default: "",

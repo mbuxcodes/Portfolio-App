@@ -14,6 +14,7 @@ const emptyFormState = {
   headline: "",
   bio: "",
   profileImage: "",
+  profileImagePublicId: "",
   profileImageAlt: "",
   highlights: "",
 };
@@ -46,6 +47,7 @@ function AboutForm() {
         headline: about.headline,
         bio: about.bio,
         profileImage: about.profileImage || "",
+        profileImagePublicId: about.profileImagePublicId || "",
         profileImageAlt: about.profileImageAlt || "",
         highlights: (about.highlights || []).join(", "),
       });
@@ -58,8 +60,12 @@ function AboutForm() {
     setSaveSuccess(false);
   };
 
-  const handleProfileImageUploadSuccess = (url) => {
-    setFormData((prev) => ({ ...prev, profileImage: url }));
+  const handleProfileImageUploadSuccess = ({ url, publicId }) => {
+    setFormData((prev) => ({
+      ...prev,
+      profileImage: url,
+      profileImagePublicId: publicId,
+    }));
     setSaveSuccess(false);
   };
 

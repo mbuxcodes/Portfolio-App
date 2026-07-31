@@ -30,8 +30,9 @@ const emptyFormState = {
   category: "Personal",
   techStack: [],
   coverImage: "",
+  coverImagePublicId: "",
   coverImageAlt: "",
-  gallery: [],
+  gallery: [], // array of { url, publicId } — matches the backend's Project.gallery shape exactly
   problem: "",
   solution: "",
   results: "",
@@ -67,8 +68,9 @@ function ProjectForm({ initialData = null }) {
         category: initialData.category,
         techStack: initialData.techStack.map((skill) => skill._id),
         coverImage: initialData.coverImage,
+        coverImagePublicId: initialData.coverImagePublicId,
         coverImageAlt: initialData.coverImageAlt,
-        gallery: initialData.gallery,
+        gallery: initialData.gallery, // already [{url, publicId}] from the backend
         problem: initialData.problem,
         solution: initialData.solution,
         results: initialData.results,
@@ -98,12 +100,19 @@ function ProjectForm({ initialData = null }) {
     }));
   };
 
-  const handleCoverImageUploadSuccess = (url) => {
-    setFormData((prev) => ({ ...prev, coverImage: url }));
+  const handleCoverImageUploadSuccess = ({ url, publicId }) => {
+    setFormData((prev) => ({
+      ...prev,
+      coverImage: url,
+      coverImagePublicId: publicId,
+    }));
   };
 
-  const handleGalleryImageAdd = (url) => {
-    setFormData((prev) => ({ ...prev, gallery: [...prev.gallery, url] }));
+  const handleGalleryImageAdd = ({ url, publicId }) => {
+    setFormData((prev) => ({
+      ...prev,
+      gallery: [...prev.gallery, { url, publicId }],
+    }));
   };
 
   const handleGalleryImageRemove = (indexToRemove) => {
@@ -227,10 +236,10 @@ function ProjectForm({ initialData = null }) {
         </label>
         {formData.gallery.length > 0 && (
           <div className="flex flex-wrap gap-sm">
-            {formData.gallery.map((url, index) => (
+            {formData.gallery.map((item, index) => (
               <ImagePreview
-                key={url}
-                src={url}
+                key={item.publicId}
+                src={item.url}
                 alt={`Gallery image ${index + 1}`}
                 onRemove={() => handleGalleryImageRemove(index)}
                 size="sm"

@@ -36,6 +36,10 @@ const skillSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    iconPublicId: {
+      type: String,
+      default: null,
+    },
     order: {
       type: Number,
       default: 0,

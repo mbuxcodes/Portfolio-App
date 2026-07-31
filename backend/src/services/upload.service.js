@@ -18,6 +18,6 @@ export const uploadService = {
       resourceType: "image",
     });
 
-    return { url: uploadResult.secure_url };
+    return { url: uploadResult.secure_url, publicId: uploadResult.public_id };
   },
 };

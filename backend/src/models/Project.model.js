@@ -38,12 +38,31 @@ const projectSchema = new mongoose.Schema(
       type: String,
       required: [true, "Cover image is required"],
     },
+    coverImagePublicId: {
+      // Parallel field alongside coverImage, same pattern as coverImageAlt —
+      // added for Cloudinary asset lifecycle management (Phase 3). Optional
+      // because documents created before this change won't have one; their
+      // old assets simply can't be auto-deleted on replacement (a disclosed,
+      // accepted limitation for pre-existing data, not a bug).
+      type: String,
+      default: null,
+    },
     coverImageAlt: {
       type: String,
       required: [true, "Cover image alt text is required for accessibility"],
     },
     gallery: {
-      type: [String],
+      // Restructured from [String] to [{url, publicId}] (Phase 3) — gallery
+      // has zero external/public consumers (verified directly before this
+      // change), making this a low-risk, cleaner alternative to maintaining
+      // two parallel index-aligned arrays, which would risk desyncing.
+      type: [
+        {
+          url: { type: String, required: true },
+          publicId: { type: String, required: true },
+          _id: false,
+        },
+      ],
       default: [],
     },
     problem: {
