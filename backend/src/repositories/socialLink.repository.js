@@ -1,4 +1,4 @@
-import SocialLink from "../models/socialLink.model.js";
+import SocialLink from "../models/SocialLink.model.js";
 
 export const socialLinkRepository = {
   async findAll() {
