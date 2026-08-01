@@ -4,7 +4,9 @@ import dotenv from "dotenv";
 // MongoDB — the same one `npm run dev` already connects to successfully —
 // not a placeholder. dotenv.config() never overrides an already-set
 // process.env value, so this must run before any fallback assignment below.
-dotenv.config();
+// { quiet: true }: same reasoning as config/env.js — keep test output
+// focused on test results, not dotenv's own promotional console tips.
+dotenv.config({ quiet: true });
 
 // Fallback values only apply if the real .env didn't provide them (e.g. a
 // CI environment with no .env file, or running only the unit tests, which
