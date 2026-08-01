@@ -1,4 +1,5 @@
 import cloudinary from "../config/cloudinary.js";
+import { logger } from "../config/logger.js";
 
 /**
  * Reusable buffer-to-Cloudinary upload, parameterized instead of hardcoded
@@ -69,9 +70,9 @@ export async function deleteCloudinaryAsset(publicId, resourceType = "image") {
     });
     return result.result === "ok";
   } catch (err) {
-    console.error(
-      `Failed to delete Cloudinary asset ${publicId}:`,
-      err.message,
+    logger.error(
+      { err, publicId },
+      `Failed to delete Cloudinary asset ${publicId}: ${err.message}`,
     );
     return false;
   }

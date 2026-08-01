@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 import { env } from "./env.js";
+import { logger } from "./logger.js";
 
 export async function connectDB() {
   try {
     await mongoose.connect(env.mongodbUri);
-    console.log("MongoDB connected successfully");
+    logger.info("MongoDB connected successfully");
   } catch (error) {
-    console.error("MongoDB connection failed:", error.message);
+    logger.error({ err: error }, `MongoDB connection failed: ${error.message}`);
     process.exit(1);
   }
 
@@ -15,14 +16,14 @@ export async function connectDB() {
   // Atlas maintenance, etc.) would fail silently — queries would just
   // start rejecting with no clear signal of why.
   mongoose.connection.on("error", (err) => {
-    console.error(
-      "MongoDB connection error after initial connect:",
-      err.message,
+    logger.error(
+      { err },
+      `MongoDB connection error after initial connect: ${err.message}`,
     );
   });
 
   mongoose.connection.on("disconnected", () => {
-    console.warn(
+    logger.warn(
       "MongoDB disconnected — Mongoose will attempt to reconnect automatically.",
     );
   });

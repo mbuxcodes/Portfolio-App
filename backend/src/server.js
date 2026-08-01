@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { env } from "./config/env.js";
 import { connectDB } from "./config/db.js";
+import { logger } from "./config/logger.js";
 import app from "./app.js";
 
 const SHUTDOWN_TIMEOUT_MS = 10_000; // hard safety net, well within Render's ~30s SIGKILL grace period
@@ -10,7 +11,10 @@ async function startServer() {
   await connectDB();
 
   const server = app.listen(env.port, () => {
-    console.log(`Server running in ${env.nodeEnv} mode on port ${env.port}`);
+    logger.info(
+      { port: env.port, nodeEnv: env.nodeEnv },
+      `Server running in ${env.nodeEnv} mode on port ${env.port}`,
+    );
   });
 
   /**
@@ -30,10 +34,10 @@ async function startServer() {
    * callback fire promptly and the shutdown log accurately reflect reality.
    */
   function shutdown(signal) {
-    console.log(`${signal} received: shutting down gracefully...`);
+    logger.info({ signal }, `${signal} received: shutting down gracefully...`);
 
     const forceExitTimer = setTimeout(() => {
-      console.error("Graceful shutdown timed out — forcing exit.");
+      logger.error("Graceful shutdown timed out — forcing exit.");
       process.exit(1);
     }, SHUTDOWN_TIMEOUT_MS);
 
@@ -42,12 +46,15 @@ async function startServer() {
       clearTimeout(forceCloseTimer);
       try {
         await mongoose.connection.close();
-        console.log(
+        logger.info(
           "All connections closed and MongoDB disconnected. Exiting cleanly.",
         );
         process.exit(0);
       } catch (err) {
-        console.error("Error closing MongoDB connection:", err.message);
+        logger.error(
+          { err },
+          `Error closing MongoDB connection: ${err.message}`,
+        );
         process.exit(1);
       }
     });
@@ -77,12 +84,12 @@ async function startServer() {
    * once shutdown() completes there's no second chance to inspect it.
    */
   process.on("uncaughtException", (err) => {
-    console.error("Uncaught exception:", err);
+    logger.error({ err }, "Uncaught exception");
     shutdown("uncaughtException");
   });
 
   process.on("unhandledRejection", (reason) => {
-    console.error("Unhandled promise rejection:", reason);
+    logger.error({ reason }, "Unhandled promise rejection");
     shutdown("unhandledRejection");
   });
 }

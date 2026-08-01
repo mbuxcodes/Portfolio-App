@@ -2,9 +2,10 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-import morgan from "morgan";
+import pinoHttp from "pino-http";
 import mongoose from "mongoose";
 import { env } from "./config/env.js";
+import { logger } from "./config/logger.js";
 import routes from "./routes/index.js";
 import { errorHandlerMiddleware } from "./middleware/errorHandler.middleware.js";
 import { success, error } from "./utils/responseEnvelope.js";
@@ -42,9 +43,27 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-if (env.nodeEnv === "development") {
-  app.use(morgan("dev"));
-}
+/**
+ * Request/response logging, replacing morgan entirely — one logger for
+ * the whole app instead of two overlapping ones. Runs in every
+ * environment (not just development, unlike the old morgan setup):
+ * production request logs are exactly what's missing today when
+ * something goes wrong after deploy and there's no way to see what
+ * traffic the server actually received.
+ *
+ * Health-check pings are excluded from auto-logging — an uptime monitor
+ * polling /api/health every 30-60s would otherwise fill the logs with
+ * noise that provides no debugging value, drowning out the requests
+ * that actually matter.
+ */
+app.use(
+  pinoHttp({
+    logger,
+    autoLogging: {
+      ignore: (req) => req.url === "/api/health",
+    },
+  }),
+);
 
 /**
  * Production-grade health check — verifies actual application health, not
